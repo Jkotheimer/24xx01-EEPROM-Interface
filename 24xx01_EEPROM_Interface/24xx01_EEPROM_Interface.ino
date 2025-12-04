@@ -13,7 +13,7 @@
 
 // Change these flags depending on your use-case
 #define DEBUG_ENABLED true   // Whether to print out debug statements on the Serial bus (this slows down the data transfer)
-#define DELAYS_ENABLED true  // Whether to include delays between signals. May be necessary to intentionally slow down the signals from higher speed arduinos
+#define DELAYS_ENABLED false  // Whether to include delays between signals. May be necessary to intentionally slow down the signals from higher speed arduinos
 
 void setup() {
   Serial.begin(115200);
@@ -34,7 +34,7 @@ void loop() {}
 
 // Read every address in the EEPROM in order. Print them out if debug is enabled
 void readFullEEPROM() {
-  startRead();
+  startRead(0);
   for (uint8_t i = 0; i < EEPROM_SIZE_BYTES; i++) {
     byte value = readSerialByte();
     if (DEBUG_ENABLED) {
@@ -144,11 +144,9 @@ void writeSerialByte(byte data) {
   acknowledge();
 }
 
-// Pulse an acknowledge bit. Leaves both SDA and CLK low
+// Pulse an acknowledge bit. Caller is expected to pull clock line back low before next operation
 void acknowledge() {
   digitalWrite(SDA_PIN, LOW);
   digitalWrite(CLK_PIN, HIGH);
-  if (DELAYS_ENABLED) delayMicroseconds(1);
-  digitalWrite(CLK_PIN, LOW);
   if (DELAYS_ENABLED) delayMicroseconds(1);
 }
